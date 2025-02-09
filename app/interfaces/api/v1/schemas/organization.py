@@ -28,3 +28,10 @@ class OrganizationSchema(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class OrganizationResultSchema(BaseModel):
+    data: List[OrganizationSchema]
+
+    class Config:
+        from_attributes = True
