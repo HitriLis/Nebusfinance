@@ -1,0 +1,11 @@
+typer==0.15.1
+uvicorn
+Unidecode==1.3.8
+python-dateutil==2.9.0.post0
+pydantic-settings==2.2.0
+fastapi==0.109.2
+dependency-injector
+alembic==1.13.1
+asyncpg==0.29.0
+SQLAlchemy==2.0.27
+Faker==35.2.0
