@@ -5,7 +5,6 @@ from app.infrastructure.repositories.organization_repository import Organization
 
 
 class RepositoryContainer(containers.DeclarativeContainer):
-    # config = providers.Configuration()
 
     database = providers.Container(DatabaseContainer)
     organization_repository = providers.Factory(

@@ -1,4 +1,4 @@
-from typing import List
+from typing import Optional, List
 from pydantic import BaseModel
 from app.interfaces.api.v1.schemas.building import BuildingSchema
 
@@ -30,7 +30,12 @@ class OrganizationSchema(BaseModel):
         from_attributes = True
 
 
-class OrganizationResultSchema(BaseModel):
+class OrganizationResponseSchema(BaseModel):
+    total: int
+    page: int
+    total_pages: int
+    next_page: Optional[int]
+    prev_page: Optional[int]
     data: List[OrganizationSchema]
 
     class Config:

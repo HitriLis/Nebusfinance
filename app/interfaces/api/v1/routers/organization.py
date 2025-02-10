@@ -1,10 +1,13 @@
+from typing import Annotated
 from dependency_injector.wiring import inject, Provide
-from fastapi import APIRouter, Request, Depends, HTTPException, status
+from fastapi import APIRouter, Request, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
 
-from app.infrastructure.repositories.organization_repository import OrganizationRepository
+from app.application.services.organization import OrganizationService
 from app.containers import Container
-from app.interfaces.api.v1.schemas.organization import OrganizationSchema, OrganizationResultSchema
+from app.interfaces.api.v1.filters.base import BasePaginationParams
+from app.interfaces.api.v1.filters.organization import OrganizationFilterByNameParams
+from app.interfaces.api.v1.schemas.organization import OrganizationSchema, OrganizationResponseSchema
 
 router = APIRouter()
 
@@ -13,41 +16,42 @@ router = APIRouter()
 @inject
 async def get_organization_detail(
         organization_id: int,
-        organization_repository: OrganizationRepository = Depends(Provide[Container.repository.organization_repository])
+        organization_services: OrganizationService = Depends(Provide[Container.services.organization_service])
 ):
-    organization = await organization_repository.get_by_id(organization_id)
-
+    organization = await organization_services.get_organization(organization_id)
     if organization:
-        return OrganizationSchema.model_validate(organization)
-    raise HTTPException(status_code=404, detail='e')
+        return organization
+    raise HTTPException(status_code=404, detail="Organization not found")
 
 
-@router.get("/organization/", response_model=OrganizationResultSchema)
+@router.get("/organization")
 @inject
 async def get_organization_by_name(
-        name: str,
-        organization_repository: OrganizationRepository = Depends(Provide[Container.repository.organization_repository])
+        params: OrganizationFilterByNameParams = Depends(),
+        organization_services: OrganizationService = Depends(Provide[Container.services.organization_service])
 ):
-    organizations = await organization_repository.get_by_name(name)
+    organizations = await organization_services.search_organizations(params.name, params.page, params.page_size)
 
-    return OrganizationResultSchema(data=organizations)
+    return OrganizationResponseSchema.model_validate(organizations)
 
 
-@router.get("/organization/building/{building_id}", response_model=OrganizationResultSchema)
+@router.get("/organization/building/{building_id}", response_model=OrganizationResponseSchema)
 @inject
 async def get_organization_by_building(
         building_id: int,
-        organization_repository: OrganizationRepository = Depends(Provide[Container.repository.organization_repository])
+        params: BasePaginationParams = Depends(),
+        organization_services: OrganizationService = Depends(Provide[Container.services.organization_service])
 ):
-    organizations = await organization_repository.get_by_building(building_id)
-    return OrganizationResultSchema(data=organizations)
+    organizations = await organization_services.search_building(building_id, params.page, params.page_size)
+    return OrganizationResponseSchema.model_validate(organizations)
 
 
-@router.get("/organization/activity/{activity_id}", response_model=OrganizationResultSchema)
+@router.get("/organization/activity/{activity_id}", response_model=OrganizationResponseSchema)
 @inject
 async def get_organization_by_activity(
         activity_id: int,
-        organization_repository: OrganizationRepository = Depends(Provide[Container.repository.organization_repository])
+        params: BasePaginationParams = Depends(),
+        organization_services: OrganizationService = Depends(Provide[Container.services.organization_service])
 ):
-    organizations = await organization_repository.get_by_activity(activity_id)
-    return OrganizationResultSchema(data=organizations)
+    organizations = await organization_services.search_activity(activity_id, params.page, params.page_size)
+    return OrganizationResponseSchema.model_validate(organizations)
