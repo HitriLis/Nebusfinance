@@ -1,16 +1,18 @@
-from typing import Annotated
 from dependency_injector.wiring import inject, Provide
-from fastapi import APIRouter, Request, Depends, HTTPException, Query
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.application.services.organization import OrganizationService
 from app.containers import Container
+from app.interfaces.api.v1.dependencies.auth import verify_api_key
 from app.interfaces.api.v1.filters.base import BasePaginationParams
 from app.interfaces.api.v1.filters.organization import OrganizationFilterByNameParams, \
     OrganizationFilterByActivityParams, OrganizationFilterByRadiusParams, OrganizationFilterRectangleParams
 from app.interfaces.api.v1.schemas.organization import OrganizationSchema, OrganizationResponseSchema
 
-router = APIRouter()
+
+router = APIRouter(
+    dependencies=[Depends(verify_api_key)]  # Все маршруты в этом роутере требуют авторизации
+)
 
 
 @router.get("/organization/by-id/{organization_id}", response_model=OrganizationSchema)

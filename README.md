@@ -20,11 +20,12 @@
 Создайте файл **.env** в корневой папке проекта и укажите параметры подключения к базе данных:
 
 ```ini
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=organizations_db
-POSTGRES_HOST=db
-POSTGRES_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=psql
+DB_PORT=5432
+DB_NAME=postgres
+API_KEY="your-secure-api-key"
 ```
 
 ### 3. **Запуск проекта**
