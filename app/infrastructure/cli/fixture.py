@@ -1,6 +1,8 @@
 import random
 from faker import Faker
 from sqlalchemy import text
+from shapely.geometry import Point
+from geoalchemy2.shape import from_shape
 from sqlalchemy.sql import insert
 from app.infrastructure.database.models import Building, Activity, Organization
 from app.infrastructure.database.models.organization import PhoneNumber, organization_activity
@@ -44,14 +46,14 @@ async def fill_fake_data():
     async with AsyncSessionLocal() as session:
         try:
             # 1️⃣ Добавляем здания (1000 штук)
-            buildings = [
-                Building(
-                    address=fake.address(),
-                    latitude=float(fake.latitude()),
-                    longitude=float(fake.longitude())
-                )
-                for _ in range(1000)
-            ]
+            buildings = []
+            for _ in range(1000):
+                location = fake.location_on_land(coords_only=True)
+                lat = location[0]
+                lon = location[1]
+                point = from_shape(Point(lon, lat), srid=4326)
+                buildings.append(Building(address=fake.address(), geom=point))
+
             session.add_all(buildings)
             await session.commit()
             print("✅ Добавлены 1000 зданий")

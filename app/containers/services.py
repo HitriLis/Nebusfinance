@@ -8,6 +8,7 @@ class ServicesContainer(containers.DeclarativeContainer):
 
     organization_service = providers.Singleton(
         OrganizationService,
-        repository=repository.organization_repository
+        organizations_repo=repository.organization_repo,
+        activity_repo=repository.activity_repo
     )
 

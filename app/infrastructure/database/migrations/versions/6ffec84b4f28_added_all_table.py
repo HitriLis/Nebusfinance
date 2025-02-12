@@ -1,16 +1,17 @@
-"""Added init table
+"""Added all table
 
-Revision ID: 5fe274edb642
+Revision ID: 6ffec84b4f28
 Revises: 
-Create Date: 2025-02-08 15:27:34.130328
+Create Date: 2025-02-11 18:04:08.216257
 
 """
 from alembic import op
 import sqlalchemy as sa
+import geoalchemy2
 
 
 # revision identifiers, used by Alembic.
-revision = '5fe274edb642'
+revision = '6ffec84b4f28'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,14 +29,11 @@ def upgrade() -> None:
     op.create_table('buildings',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('address', sa.String(), nullable=True),
-    sa.Column('latitude', sa.Float(), nullable=True),
-    sa.Column('longitude', sa.Float(), nullable=True),
+    sa.Column('geom', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', nullable=False), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_buildings_address'), 'buildings', ['address'], unique=False)
     op.create_index(op.f('ix_buildings_id'), 'buildings', ['id'], unique=False)
-    op.create_index(op.f('ix_buildings_latitude'), 'buildings', ['latitude'], unique=False)
-    op.create_index(op.f('ix_buildings_longitude'), 'buildings', ['longitude'], unique=False)
     op.create_table('organizations',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
@@ -70,10 +68,9 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_organizations_name'), table_name='organizations')
     op.drop_index(op.f('ix_organizations_id'), table_name='organizations')
     op.drop_table('organizations')
-    op.drop_index(op.f('ix_buildings_longitude'), table_name='buildings')
-    op.drop_index(op.f('ix_buildings_latitude'), table_name='buildings')
     op.drop_index(op.f('ix_buildings_id'), table_name='buildings')
     op.drop_index(op.f('ix_buildings_address'), table_name='buildings')
+    op.drop_index('idx_buildings_geom', table_name='buildings', postgresql_using='gist')
     op.drop_table('buildings')
     op.drop_table('activities')
     # ### end Alembic commands ###

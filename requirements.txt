@@ -8,4 +8,6 @@ dependency-injector
 alembic==1.13.1
 asyncpg==0.29.0
 SQLAlchemy==2.0.27
+GeoAlchemy2==0.17.0
+shapely==2.0.7
 Faker==35.2.0
